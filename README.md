@@ -12,7 +12,10 @@ con links tu puedes hacer una base de informacion y recuperar junto imagenes
 
 ## Installation
 
-Explain how to install or set up your forked project, if necessary.
+Clona este repositorio:
+
+1. clona este repositorio
+3. corre el codigo 'python3 app.py'
 
 ## Usage
 
