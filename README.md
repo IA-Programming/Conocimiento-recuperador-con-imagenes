@@ -4,7 +4,7 @@ This is my fork of the project.
 
 ## Video Tutorial
 
-[![Video Tutorial](https://img.youtube.com/vi/VIDEO_ID_HERE/0.jpg)](https://www.youtube.com/watch?v=qKtM2AlDTs8)
+[![Video Tutorial](https://img.youtube.com/vi/qKtM2AlDTs8/0.jpg)](https://www.youtube.com/watch?v=qKtM2AlDTs8)
 
 ## Description
 
