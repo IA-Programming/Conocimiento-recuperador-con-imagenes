@@ -6,8 +6,6 @@ This is my fork of the project.
 
 [![Video Tutorial](https://img.youtube.com/vi/VIDEO_ID_HERE/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID_HERE)
 
-Click on the above image to watch the video tutorial in Spanish.
-
 ## Description
 
 con links tu puedes hacer una base de informacion y recuperar junto imagenes
