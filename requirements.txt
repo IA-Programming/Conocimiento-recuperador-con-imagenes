@@ -1,0 +1,6 @@
+html2text
+langchain
+llama_index
+openai
+python_dotenv
+beautifulsoup4
