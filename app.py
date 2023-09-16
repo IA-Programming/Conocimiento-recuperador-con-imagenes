@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-from dotenv import load_dotenv
 import requests
 import json
 import os
@@ -13,53 +12,32 @@ from langchain.prompts import ChatPromptTemplate
 from llama_index import VectorStoreIndex
 import openai
 
-load_dotenv()
-brwoserless_api_key = os.getenv("BROWSERLESS_API_KEY")
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
 
 # 1. Scrape raw HTML
 
 def scrape_website(url: str):
 
     print("Scraping website...")
-    # Define the headers for the request
-    headers = {
-        'Cache-Control': 'no-cache',
-        'Content-Type': 'application/json',
-    }
 
-    # Define the data to be sent in the request
-    data = {
-        "url": url,
-        "elements": [{
-            "selector": "body"
-        }]
-    }
+    try:
+        # Send a GET request to the URL
+        response = requests.get(url)
 
-    # Convert Python object to JSON string
-    data_json = json.dumps(data)
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Parse the HTML content of the page using BeautifulSoup
+            soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Send the POST request
-    response = requests.post(
-        f"https://chrome.browserless.io/scrape?token={brwoserless_api_key}",
-        headers=headers,
-        data=data_json
-    )
+            # Extract the HTML content from the parsed page
+            html_string = str(soup)
 
-    # Check the response status code
-    if response.status_code == 200:
-        # Decode & Load the string as a JSON object
-        result = response.content
-        data_str = result.decode('utf-8')
-        data_dict = json.loads(data_str)
-
-        # Extract the HTML content from the dictionary
-        html_string = data_dict['data'][0]['results'][0]['html']
-
-        return html_string
-    else:
-        print(f"HTTP request failed with status code {response.status_code}")
+            return html_string
+        else:
+            print(f"HTTP request failed with status code {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None
 
 
 # 2. Convert html to markdown
