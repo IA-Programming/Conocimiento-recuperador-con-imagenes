@@ -4,3 +4,4 @@ llama_index
 openai
 python_dotenv
 beautifulsoup4
+streamlit
