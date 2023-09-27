@@ -9,14 +9,11 @@ from llama_index import Document
 from llama_index.node_parser import SimpleNodeParser
 from llama_index.text_splitter import TokenTextSplitter
 from langchain.prompts import ChatPromptTemplate
-from llama_index import VectorStoreIndex
 import openai
-
 
 # 1. Scrape raw HTML
 
 def scrape_website(url: str):
-
     print("Scraping website...")
 
     try:
@@ -35,7 +32,7 @@ def scrape_website(url: str):
         else:
             print(f"HTTP request failed with status code {response.status_code}")
             return None
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         print(f"An error occurred: {str(e)}")
         return None
 
@@ -86,10 +83,9 @@ def convert_to_absolute_url(html, base_url):
 
     for link_tag in soup.find_all('a'):
         href = link_tag.get('href')
-        if href.startswith(('http://', 'https://')):
-            continue
-        absolute_url = urljoin(base_url, href)
-        link_tag['href'] = absolute_url
+        if href is not None and not href.startswith(('http://', 'https://')):
+            absolute_url = urljoin(base_url, href)
+            link_tag['href'] = absolute_url
 
     updated_html = str(soup)
 
@@ -107,7 +103,7 @@ def get_markdown_from_url(url):
 
 # 3. Create vector index from markdown
 
-def create_index_from_text(markdown):
+def create_nodes_from_text(markdown, url):
     text_splitter = TokenTextSplitter(
         separator="\n",
         chunk_size=1024,
@@ -116,14 +112,10 @@ def create_index_from_text(markdown):
     )
 
     node_parser = SimpleNodeParser(text_splitter=text_splitter)
-    nodes = node_parser.get_nodes_from_documents(
-        [Document(text=markdown)], show_progress=True)
-
-    # build index
-    index = VectorStoreIndex(nodes)
-
-    print("Index created!")
-    return index
+    nodes = node_parser.get_nodes_from_documents(    
+        [Document(text=markdown, metadata={'url':url})], show_progress=True)
+    
+    return nodes
 
 
 # 4. Retrieval Augmented Generation (RAG)
@@ -160,9 +152,9 @@ def generate_answer(query, index):
     return response.content
 
 
-url = "https://developers.webflow.com/docs/getting-started-with-apps"
-query = "How to create a Webflow app?"
-markdown = get_markdown_from_url(url)
-index = create_index_from_text(markdown)
-answer = generate_answer(query, index)
-print(answer)
+# url = "https://developers.webflow.com/docs"
+# query = "How to create a Webflow app?"
+# markdown = get_markdown_from_url(url)
+# index = create_index_from_text(markdown)
+# answer = generate_answer(query, index)
+# print(answer)
