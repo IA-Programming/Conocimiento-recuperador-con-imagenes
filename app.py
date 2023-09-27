@@ -1,15 +1,10 @@
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 import requests
-import json
-import os
 import html2text
-from langchain.chat_models import ChatOpenAI
 from llama_index import Document
 from llama_index.node_parser import SimpleNodeParser
 from llama_index.text_splitter import TokenTextSplitter
-from langchain.prompts import ChatPromptTemplate
-import openai
 
 # 1. Scrape raw HTML
 
@@ -110,47 +105,14 @@ def create_nodes_from_text(markdown, url):
         chunk_overlap=20,
         backup_separators=["\n\n", ".", ","]
     )
+    docs = []
+    for Mark in markdown:
+        docs.append(Document(text=Mark, metadata={'url':url}))
 
     node_parser = SimpleNodeParser(text_splitter=text_splitter)
-    nodes = node_parser.get_nodes_from_documents(    
-        [Document(text=markdown, metadata={'url':url})], show_progress=True)
+    nodes = node_parser.get_nodes_from_documents(docs, show_progress=True)
     
     return nodes
-
-
-# 4. Retrieval Augmented Generation (RAG)
-
-
-def generate_answer(query, index):
-
-    # Get relevant data with similarity search
-    retriever = index.as_retriever()
-    nodes = retriever.retrieve(query)
-    texts = [node.node.text for node in nodes]
-
-    print("Retrieved texts!", texts)
-
-    # Generate answer with OpenAI
-    model = ChatOpenAI(model_name="gpt-3.5-turbo-16k-0613")
-    template = """
-    CONTEXT: {docs}
-    You are a helpful assistant, above is some context, 
-    Please answer the question, and make sure you follow ALL of the rules below:
-    1. Answer the questions only based on context provided, do not make things up
-    2. Answer questions in a helpful manner that straight to the point, with clear structure & all relevant information that might help users answer the question
-    3. Anwser should be formatted in Markdown
-    4. If there are relevant images, video, links, they are very important reference data, please include them as part of the answer
-
-    QUESTION: {query}
-    ANSWER (formatted in Markdown):
-    """
-    prompt = ChatPromptTemplate.from_template(template)
-    chain = prompt | model
-
-    response = chain.invoke({"docs": texts, "query": query})
-
-    return response.content
-
 
 # url = "https://developers.webflow.com/docs"
 # query = "How to create a Webflow app?"

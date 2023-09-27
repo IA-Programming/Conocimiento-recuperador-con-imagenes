@@ -14,27 +14,6 @@ from app import create_nodes_from_text
 from llama_index import VectorStoreIndex
 from datetime import datetime
 now = datetime.now()
-import pprint
-
-chatresponse = """
-<style>
-main{
-   overflow:hidden;
-   width:100%;
-}
-
-img{
-  max-width: 100%;
-  height: auto
-}
-</style>
-
-<div clas="main">
-{{markdown}}
-</div>
-"""
-
-pp = pprint.PrettyPrinter(sort_dicts=False)
 
 def prompt4conversation(prompt,context):
     final_prompt = f"""INFORMACION GENERAL : ( hoy es {now.strftime('%d/%m/%Y %H:%M:%S')} , Tu fuiste creado por IA-Programming el propietario de BlazzmoCompany
@@ -166,7 +145,7 @@ with st.sidebar:
         if st.session_state['plugin'] == "🔗 Habla usando links" and 'web_sites' not in st.session_state:
             with st.expander("🔗 Habla usando links", expanded=True):
                 #get user input for URLs
-                num_links = st.number_input("Enter the number of URLs:", min_value=1, max_value=1, value=1,step=1)
+                num_links = st.number_input("Enter the number of URLs(max 5 urls):", min_value=1, max_value=5, value=1,step=1)
 
                 url_inputs = []
                 for i in range(num_links):
@@ -176,39 +155,34 @@ with st.sidebar:
                 if url_inputs is not None and st.button('🔗✅ Añade website al contexto'):
                     if url_inputs != []:
                         #max 10 websites
-                        t=1
+                        Markdown = []
                         with st.spinner('🔗 Extrayendo TEXTO de Websites ...'):
                             for url in url_inputs:
-                                if t==1:
-                                    Markdown = get_markdown_from_url(url)
-                                    nodes = create_nodes_from_text(Markdown,url)
-                                    t+=1
-                                else:
-                                    Markdown = get_markdown_from_url(url)
-                                    nodes.append(i for i in create_nodes_from_text(Markdown))
-                                    t+=1
+                                Markdown.append(get_markdown_from_url(url))
+
+                            nodes = create_nodes_from_text(Markdown,url)
                             
                             text = [node.text for node in nodes]
                             # creating a vectorstore
 
                         with st.spinner('🔗 Creando Vectorstore...'):
-                            # # Create a vectorstore from documents
-                            # random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-                            # # build index
-                            # db = VectorStoreIndex(nodes=nodes)
-                            random_str = 'T0YMOIBZCF'
-                            from llama_index import StorageContext, load_index_from_storage
-                            # rebuild storage context
-                            storage_context = StorageContext.from_defaults(persist_dir="./storage" + random_str)
-                            # load index
-                            db = load_index_from_storage(storage_context)
+                            # Create a vectorstore from documents
+                            random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+                            # build index
+                            db = VectorStoreIndex(nodes=nodes)
+                            # random_str = 'T0YMOIBZCF'
+                            # from llama_index import StorageContext, load_index_from_storage
+                            # # rebuild storage context
+                            # storage_context = StorageContext.from_defaults(persist_dir="./storage" + random_str)
+                            # # load index
+                            # db = load_index_from_storage(storage_context)
                             print("Index created!")
                         with st.spinner('🔗 Salvando Vectorstore...'):
-                            # # save vectorstore
-                            # db.storage_context.persist(persist_dir="./storage" + random_str)
-                            # #create .zip file of directory to download
-                            # shutil.make_archive("./storage" + random_str, 'zip', "./storage" + random_str)
-                            # # save in session state and download
+                            # save vectorstore
+                            db.storage_context.persist(persist_dir="./storage" + random_str)
+                            #create .zip file of directory to download
+                            shutil.make_archive("./storage" + random_str, 'zip', "./storage" + random_str)
+                            # save in session state and download
                             st.session_state['db'] = "./storage" + random_str + ".zip" 
                         
                         with st.spinner('🔗 Creando cadena de QA...'):
@@ -313,9 +287,7 @@ def generate_response(prompt):
                 nodes = st.session_state['retriever'].retrieve(prompt)
                 texts = [node.node.text for node in nodes]
                 print("Retrieved texts!")
-                pp.pprint(texts)
                 result = st.session_state['web_sites'].invoke({"docs": texts, "query": prompt})
-                print(f"\033[32m{result}\033[32m")
                 solution = result.content
                 if len(solution.split()) > 110:
                     make_better = False
@@ -382,7 +354,5 @@ with response_container:
             st.markdown('', unsafe_allow_html=True)
             
     else:
-        st.write("else Statement")
-        st.write(st.session_state)
         st.info("👋 Hey , estamos muy happy por verte aqui 🤗")
         st.error("👉 Coloca tu OpenAI API Key 🤗")
