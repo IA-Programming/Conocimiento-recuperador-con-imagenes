@@ -5,7 +5,7 @@ import shutil
 import string
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
-from langchain.schema import AIMessage, HumanMessage, SystemMessage
+from langchain.schema import HumanMessage, SystemMessage
 from streamlit_extras.add_vertical_space import add_vertical_space
 import streamlit as st
 from streamlit.components.v1 import html
@@ -82,13 +82,13 @@ with st.sidebar:
 
                     try:
                         openai.api_key = st.session_state.openai_api_key
-                        # respuesta = openai.ChatCompletion.create(
-                        # model="gpt-3.5-turbo-16k-0613",
-                        # messages=[
-                        #     {"role": "system", "content": "You are a helpful assistant."},
-                        #     {"role": "user", "content": "Hello!"}
-                        # ]
-                        # )
+                        respuesta = openai.ChatCompletion.create(
+                        model="gpt-3.5-turbo-16k-0613",
+                        messages=[
+                            {"role": "system", "content": "You are a helpful assistant."},
+                            {"role": "user", "content": "Hello!"}
+                        ]
+                        )
                         
                     except Exception as e:
                         st.error(e)
@@ -314,12 +314,10 @@ def generate_response(prompt):
 
         if make_better:
             with st.spinner('🚀 Generando respuesta...'):
-                print(f"\033[36m{final_prompt}\033[36m")
                 response = st.session_state['chatbot'](messages=[SystemMessage(content="You always answer polite and helpful, **your answers are in the language of the user question**"),HumanMessage(content=final_prompt)])
                 response = response.content
                 response += source
         else:
-            print(f"\033[33m{final_prompt}\033[33m")
             response = final_prompt
 
     return response
@@ -354,5 +352,6 @@ with response_container:
             st.markdown('', unsafe_allow_html=True)
             
     else:
-        st.info("👋 Hey , estamos muy happy por verte aqui 🤗")
+        st.info("👋 Hey , estamos muy Feliz por verte aqui 🤗")
+        st.info("👉 El objetivo de esta app es de poder visualizar tus respuesta de los sitios webs que uses como referencia para tu base de datos 🚀")
         st.error("👉 Coloca tu OpenAI API Key 🤗")
