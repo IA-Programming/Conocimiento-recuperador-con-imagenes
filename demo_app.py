@@ -353,5 +353,5 @@ with response_container:
             
     else:
         st.info("👋 Hey , estamos muy Feliz por verte aqui 🤗")
-        st.info("👉 El objetivo de esta app es de poder visualizar tus respuesta de los sitios webs que uses como referencia para tu base de datos 🚀")
+        st.info("👉 El objetivo de esta app es de poder visualizar las imagenes en tus respuesta de los sitios webs que uses como referencia para tu base de datos 🚀")
         st.error("👉 Coloca tu OpenAI API Key 🤗")
