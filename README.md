@@ -19,7 +19,16 @@ Clona este repositorio:
 
 ## Usage
 
-Provide instructions on how to use your forked project.
+- **Try it online**
+    - No need to install
+    - [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://web-chat-gpt.streamlit.app/)
+    
+- **O instálalo localmente**
+    - 💾 Download the repository
+    - 🔗 unzip
+    - 🛑 Install `requirements.txt`
+    - ✅ Execute `streamlit run app.py`
+    - 🚀 ¡Enjoy it! 
 
 ## Contributing
 
